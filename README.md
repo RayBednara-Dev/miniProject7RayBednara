@@ -30,8 +30,6 @@ environment instead of hard-coded.
 **Project structure**
 * `server.py` &mdash; the FastMCP server and its five tools (the deliverable)
 * `requirements.txt` &mdash; `mcp[cli]`, `httpx`, `python-dotenv`
-* `.env.example` &mdash; template for local environment variables (copy to `.env`)
-* `transcript.md` &mdash; acceptance test transcript
 
 ## Getting Started
 
@@ -57,8 +55,8 @@ never hard-coded:
   `https://practice.fhsucyber.com` if not set)
 * `PRACTICE_API_TOKEN` &mdash; your Practice Hub bearer token (required)
 
-For local testing, copy `.env.example` to `.env` and fill in your token &mdash;
-`server.py` calls `load_dotenv()` on startup, and `.env` is listed in
+For local testing, you can put them in a `.env` file in the project root
+&mdash; `server.py` calls `load_dotenv()` on startup, and `.env` is listed in
 `.gitignore` so it's never committed. Otherwise set the variables directly:
 ```powershell
 # Windows PowerShell
@@ -108,8 +106,9 @@ Run it headlessly with:
 claude -p "Using ONLY the practice-hub MCP server tools: 1) list my posts (mine=true), 2) create a new post titled 'MP7 MCP Acceptance Test', 3) update that post's title/body, 4) fetch it again to confirm the update, 5) delete the test post." \
   --allowedTools "mcp__practice-hub__list_posts" "mcp__practice-hub__create_post" "mcp__practice-hub__update_post" "mcp__practice-hub__get_post" "mcp__practice-hub__delete_post"
 ```
-The full transcript of this run &mdash; every tool call, its input, and the
-API's response &mdash; is in [`transcript.md`](transcript.md).
+This prints a step-by-step report of each tool call and the Practice Hub
+API's response, confirming the full read &rarr; create &rarr; update &rarr;
+verify round trip.
 
 ## Authors
 
@@ -124,10 +123,9 @@ Claude Code (Anthropic) was used throughout this project to:
 * Write `server.py` (the FastMCP server, its five tools, and the shared
   request helper that normalizes Practice Hub API errors into clear
   `{"error": ...}` messages)
-* Scaffold `requirements.txt`, `.gitignore`, `.env.example`, and this README
-* Run `claude mcp add` to register the server with Claude Code, and drive the
-  headless acceptance test (`claude -p ...`) whose output is recorded in
-  `transcript.md`
+* Scaffold `requirements.txt`, `.gitignore`, and this README
+* Run `claude mcp add` to register the server with Claude Code, and drive
+  the headless acceptance test (`claude -p ...`) described above
 
 All generated code was reviewed, run, and tested locally by the author before
 being committed. The Practice Hub endpoint behavior itself was taken directly
