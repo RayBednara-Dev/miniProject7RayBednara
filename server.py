@@ -121,5 +121,65 @@ def get_post(post_id: int) -> dict:
     return _request("GET", f"/api/v1/posts/{post_id}")
 
 
+@mcp.tool()
+def create_post(title: str, body: str = "", tags: Optional[list[str]] = None) -> dict:
+    """Create a new post on the Practice Hub, owned by the current user.
+
+    Args:
+        title: The title of the new post.
+        body: The text content of the post. Defaults to an empty string.
+        tags: Optional list of tag strings to attach to the post.
+    """
+    payload = {"title": title, "body": body, "tags": tags or []}
+    return _request("POST", "/api/v1/posts", json=payload)
+
+
+@mcp.tool()
+def update_post(
+    post_id: int,
+    title: Optional[str] = None,
+    body: Optional[str] = None,
+    tags: Optional[list[str]] = None,
+) -> dict:
+    """Edit one of your own posts on the Practice Hub.
+
+    Only the fields you provide are changed; omit a field to leave it
+    as-is. The Practice Hub only lets you edit posts you own - trying to
+    edit someone else's post returns a 403 Forbidden, and editing a post
+    that doesn't exist returns a 404 Not found. Both are reported back
+    as a clear {"error": ...} message rather than raising an exception.
+
+    Args:
+        post_id: The id of the post to update.
+        title: New title, if changing.
+        body: New body text, if changing.
+        tags: New list of tags, if changing (replaces the existing tags).
+    """
+    payload = {}
+    if title is not None:
+        payload["title"] = title
+    if body is not None:
+        payload["body"] = body
+    if tags is not None:
+        payload["tags"] = tags
+    if not payload:
+        return {"error": "Nothing to update - provide at least one of title, body, or tags."}
+    return _request("PATCH", f"/api/v1/posts/{post_id}", json=payload)
+
+
+@mcp.tool()
+def delete_post(post_id: int) -> dict:
+    """Delete one of your own posts on the Practice Hub.
+
+    Deleting a post you don't own returns a 403 Forbidden, and deleting
+    a post that doesn't exist returns a 404 Not found; both come back as
+    a clear error message instead of an unhandled exception.
+
+    Args:
+        post_id: The id of the post to delete.
+    """
+    return _request("DELETE", f"/api/v1/posts/{post_id}")
+
+
 if __name__ == "__main__":
     mcp.run()
